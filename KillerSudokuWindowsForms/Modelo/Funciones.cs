@@ -4,8 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PruebasSudoku
-{
+namespace PruebasSudoku {
     public class Funciones
     {
 
