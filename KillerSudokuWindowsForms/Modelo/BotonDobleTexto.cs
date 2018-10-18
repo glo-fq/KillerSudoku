@@ -8,6 +8,9 @@ using System.Windows.Forms;
 
 namespace KillerSudokuWindowsForms.Modelo
 {
+    /// <summary>
+    /// Botón que muestra 2 textos diferentes. Usado para poner operaciones y soluciones en el mismo cuadro.
+    /// </summary>
     class BotonDobleTexto : Button
     {
         public BotonDobleTexto()

@@ -25,7 +25,7 @@ namespace KillerSudokuWindowsForms {
 
         }
 
-        private void GenerateTable(int columnCount, int rowCount)
+        private void GenerateTable(int columnCount, int rowCount) //Generar tabla con sus botones
         {
             //Clear out the existing controls, we are generating a new table layout
             tableLayoutPanel1.Controls.Clear();
@@ -93,8 +93,11 @@ namespace KillerSudokuWindowsForms {
 
         private void btnGenerar_Click(object sender, EventArgs e)  //Generar
         { 
+            //Generar instancia de sudoku de dimensiones del valor del trackbar
             f = new Funciones(trckTam.Value);
+            //Crear un sudoku de las dimensiones especificadas
             f.CrearSudokusFinal();
+            //Dimension es el valor actual en el trackbar
             dimension = trckTam.Value;
 
             GenerateTable(trckTam.Value, trckTam.Value);
@@ -168,6 +171,7 @@ namespace KillerSudokuWindowsForms {
 
         private void button3_Click(object sender, EventArgs e) //Cargar
         {
+            //Abrir el explorador de archivos en modo de abrir archivo
             openFileDialog1.ShowDialog();
         }
 
@@ -185,19 +189,24 @@ namespace KillerSudokuWindowsForms {
         {
             using (System.IO.StreamReader readtext = new System.IO.StreamReader(openFileDialog1.FileName))
             {
+                //Primera línea del documento, o sea, las dimensiones del sudoku
                 string linea = readtext.ReadLine();
+                //String de las dimensiones
                 string size = "";
                 int conta = 0;
 
-
+                //Leer la línea
                 while (linea[conta] != ';')
                 {
                     size += linea[conta];
                     conta++;
                 }
+                //Pasar string de dimensiones a int
                 int dimensiones = Convert.ToInt32(size);
+                //Asignarlo a dimension del suoku actual
                 dimension = dimensiones;
 
+                //Nueva instancia de sudoku con esas dimensiones y cargar archivo a instancia
                 f = new Funciones(dimensiones);
                 f.Cargar(openFileDialog1.FileName);
 
@@ -213,6 +222,7 @@ namespace KillerSudokuWindowsForms {
         private void saveFileDialog1_FileOk(object sender, CancelEventArgs e) //Una vez escogido archivo a guardar
         {
             f.Guardar(saveFileDialog1.FileName);
+            //Mensaje de éxito
             MessageBox.Show("Guardado con éxito");
         }
 
@@ -222,8 +232,10 @@ namespace KillerSudokuWindowsForms {
             //Iniciar temporizador
             Stopwatch watch = Stopwatch.StartNew();
 
+
             f.EjecutarAlgoritmoResolucion();
 
+            //Mostrar solucion en tablero
             int[,] solucion = f.GetSolucion();
             for (int i = 0; i < dimension; i++)
             {
@@ -233,13 +245,18 @@ namespace KillerSudokuWindowsForms {
                 }
             }
 
-            watch.Stop();
-            long elapsedMs = watch.ElapsedMilliseconds;
+            //Mostrar total de backtracking en el label correspondiente
             lblBacktracking.Text = f.GetBackTracking().ToString();
-            
+
+            //Parar temporizador
+            watch.Stop();
+            //Tiempo total de ejecución en milisegundos
+            long elapsedMs = watch.ElapsedMilliseconds;
+            //Extraer minutos, segundos y milisegundos del tiempo total
             int minutos = Convert.ToInt32(elapsedMs / 60000);
             int segundos = Convert.ToInt32((elapsedMs / 1000) % 60);
             int milisegundos = Convert.ToInt32(elapsedMs % 1000);
+            //Mostrar tiempo total en el label del tiempo
             lblTiempo.Text = minutos.ToString() + "m "  + segundos.ToString() + "s "+ milisegundos.ToString() + "ms";
         }
     }
