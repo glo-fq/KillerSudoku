@@ -3,32 +3,58 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
-namespace PruebasSudoku {
+namespace KillerSudokuWindowsForms.Modelo
+{
     public class Funciones
     {
 
 
         int N { set; get; } //este es el tam del tablero 
-        int[,] EspacioSoluciones { get; set; }
+
         int[,] Tablero { get; set; }
         int NumFigura { get; set; }
         int[,] FigurasArray { get; set; }
         Figura[] ListaFiguras { get; set; }
+        int[,] Solucion { get; set; }
+        int BackTracking { get; set; }
+
 
         public Funciones(int Num)
         {
             N = Num;
             ListaFiguras = new Figura[N * N];
             Tablero = new int[N, N];
-            EspacioSoluciones = new int[N, N];
+
             NumFigura = 1;
             FigurasArray = new int[N, N];
+            Solucion = new int[N, N];
+            BackTracking = 0;
 
 
 
         }
-
+        public void SetN(int num)
+        {
+            N = num;
+        }
+        public void SetBackTracking(int num)
+        {
+            BackTracking += num;
+        }
+        public int GetBackTracking()
+        {
+            return BackTracking;
+        }
+        public Figura[] GetListaFiguras()
+        {
+            return ListaFiguras;
+        }
+        public int[,] GetSolucion()
+        {
+            return Solucion;
+        }
         public Ubicacion NextEmpty(int[,] tab)
         {
             Ubicacion ubi;
@@ -649,28 +675,33 @@ namespace PruebasSudoku {
 
 
         }
-
-        public void ImprimirFiguras()
+        public int ContarElementosLista()
         {
             int cont = 0;
 
             while (ListaFiguras[cont] != null)
             {
-                Figura f = ListaFiguras[cont];
-                string tipoFigura = f.GetTipo();
-                Ubicacion[] ubicaciones = f.GetLista();
-                Console.WriteLine("Figura:" + tipoFigura);
-                int cont2 = 0;
-                while (cont2 < ubicaciones.Length)
-                {
-                    Ubicacion ubi = ubicaciones[cont2];
-                    string str1 = ubi.GetX().ToString();
-                    string str2 = ubi.GetY().ToString();
-                    Console.WriteLine("Ubicaciones: " + "[" + str1 + "," + str2 + "]");
-                    cont2++;
-                }
                 cont++;
             }
+            return cont;
+        }
+
+        public void ImprimirFig()
+        {
+            int cont = 0;
+            String str = "";
+            Console.WriteLine();
+
+            while (ListaFiguras[cont] != null)
+            {
+                Figura f = ListaFiguras[cont];
+                string tipoFigura = f.GetTipo();
+                string meta = f.GetNumMeta().ToString();
+                str += tipoFigura + "," + meta + f.GetOperacion() + ";" + System.Environment.NewLine;
+
+                cont++;
+            }
+            Console.Out.WriteLine(str);
         }
 
         public void SetListaFiguras(Figura fig)
@@ -688,52 +719,54 @@ namespace PruebasSudoku {
                     cont++;
             }
         }
+        public void SetLista(Figura[] lista, Figura fig)
+        {
+            int cont = 0;
+            bool bandera = false;
+            while (bandera != true)
+            {
+                if (lista[cont] == null)
+                {
+                    lista[cont] = fig;
+                    bandera = true;
+                }
+                else
+                    cont++;
+            }
+        }
 
 
 
-        public bool VerificarFilas(int[,] tablero, int num, int coordenadaX, int coordenadaY)
+        public bool VerificarFilasYColumnas(int[,] tablero, int num, int coordenadaX, int coordenadaY)
         {
             int[] fila = new int[N];
-            int cont = 0;
-
-            for (int i = 0; i < N; i++)
-            {
-                for (int j = 0; j < N; j++)
-                {
-                    if (j == coordenadaY)
-                    {
-                        fila[cont] = tablero[i, j];
-                        cont++;
-                    }
-                }
-            }
-
-            for (int k = 0; k < N; k++)
-            {
-                if (num == fila[k])
-                    return false;
-            }
-            return true;
-        }
-        public bool VerificarColumnas(int[,] tablero, int num, int coordenadaX, int coordenadaY)
-        {
             int[] columna = new int[N];
-            int cont = 0;
+            int contF = 0;
+            int contCol = 0;
+
             for (int i = 0; i < N; i++)
             {
                 for (int j = 0; j < N; j++)
                 {
-                    if (i == coordenadaX)
+                    if ((j == coordenadaY) || (i == coordenadaX))
                     {
-                        columna[cont] = tablero[i, j];
-                        cont++;
+                        if (j == coordenadaY)
+                        {
+                            fila[contF] = tablero[i, j];
+                            contF++;
+                        }
+                        if (i == coordenadaX)
+                        {
+                            columna[contCol] = tablero[i, j];
+                            contCol++;
+                        }
                     }
                 }
             }
 
             for (int k = 0; k < N; k++)
             {
-                if (num == columna[k])
+                if (num == fila[k] || num == columna[k])
                     return false;
             }
             return true;
@@ -760,8 +793,6 @@ namespace PruebasSudoku {
                     }
                 }
                 cont++;
-
-
             }
             return resul;
         }
@@ -781,6 +812,120 @@ namespace PruebasSudoku {
             return true;
 
         }
+        public void ModificarFigura(int x, int y, int numero, int aumentarOquitar)    //1 = aumentar , 2 = quitar
+        {
+
+            int cont = 0;
+
+            bool flag = false;
+            while (ListaFiguras != null && flag == false)
+            {
+                Figura fig = ListaFiguras[cont];
+                Ubicacion[] ubi = fig.GetLista();
+                for (int i = 0; i < ubi.Length; i++)
+                {
+                    int ubiX = ubi[i].GetX();
+                    int ubiY = ubi[i].GetY();
+                    if (ubiX == x && ubiY == y)
+                    {
+                        if ((ListaFiguras[cont].GetOperacion() == "+") && aumentarOquitar == 1)
+                        {
+                            ListaFiguras[cont].AumentarAcumuladoSum(numero);
+                            ListaFiguras[cont].AumentarOcupado(1);
+                        }
+                        if ((ListaFiguras[cont].GetOperacion() == "+") && aumentarOquitar == 2)
+                        {
+                            ListaFiguras[cont].DisminuirAcumuladoSum(numero);
+                            ListaFiguras[cont].DisminuirOcupado(1);
+                        }
+                        if ((ListaFiguras[cont].GetOperacion() == "x") && aumentarOquitar == 1)
+                        {
+                            ListaFiguras[cont].AumentarAcumuladoMul(numero);
+                            ListaFiguras[cont].AumentarOcupado(1);
+                        }
+                        if ((ListaFiguras[cont].GetOperacion() == "x") && aumentarOquitar == 2)
+                        {
+                            ListaFiguras[cont].DisminuirAcumuladoMul(numero);
+                            ListaFiguras[cont].DisminuirOcupado(1);
+                        }
+                        flag = true;
+
+                        break;
+                    }
+                }
+                cont++;
+            }
+
+
+
+        }
+        public bool VerificarOperacion(int[,] tablero, int num, int coordenadaX, int coordenadaY)
+        {
+
+            Figura fig = BuscarFigura(coordenadaX, coordenadaY);
+            String operacion = fig.GetOperacion();
+            int acumulado = fig.GetAcumulado();
+            int meta = fig.GetNumMeta();
+
+            if (operacion == "+")
+            {
+                if (fig.GetTipo() != "solo" && fig.GetTipo() != "dos")
+                {
+                    int totalSuma = acumulado + num;
+                    if ((totalSuma <= meta) && (fig.GetOcupado() < 3))
+                        return true;
+
+                    if ((totalSuma == meta) && (fig.GetOcupado() == 3))
+                        return true;
+                    else
+                        return false;
+                }
+                if (fig.GetTipo() == "dos")
+                {
+                    int totalSuma = acumulado + num;
+                    if ((totalSuma <= meta) && (fig.GetOcupado() < 1))
+                        return true;
+
+                    if ((totalSuma == meta) && (fig.GetOcupado() == 1))
+                        return true;
+                    else
+                        return false;
+                }
+                if (fig.GetTipo() == "solo")
+                    return true;
+            }
+            if (operacion == "x")
+            {
+                if (fig.GetTipo() != "solo" && fig.GetTipo() != "dos")
+                {
+                    int totalMul = acumulado * num;
+                    if ((totalMul <= meta) && (fig.GetOcupado() < 3))
+                        return true;
+
+                    if ((totalMul == meta) && (fig.GetOcupado() == 3))
+                        return true;
+                    else
+                        return false;
+                }
+                if (fig.GetTipo() == "dos")
+                {
+                    int totalMul = acumulado * num;
+                    if ((totalMul <= meta) && (fig.GetOcupado() < 1))
+                        return true;
+
+                    if ((totalMul == meta) && (fig.GetOcupado() == 1))
+                        return true;
+                    else
+                        return false;
+                }
+                if (fig.GetTipo() == "solo")
+                    return true;
+
+            }
+            if (operacion == "")
+                return true;
+            return false;
+        }
 
         public int[,] GenerarSudoku()
         {
@@ -792,12 +937,23 @@ namespace PruebasSudoku {
                 int aleatorioX = rnd.Next(0, N);
                 int aleatorioY = rnd.Next(0, N);
                 int aleatorioNum = rnd.Next(1, N + 1);
-                if (VerificarColumnas(Tablero, aleatorioNum, aleatorioX, aleatorioY) && VerificarFilas(Tablero, aleatorioNum, aleatorioX, aleatorioY) && VerificarFigura(Tablero, aleatorioNum, aleatorioX, aleatorioY))
+                if (VerificarFilasYColumnas(Tablero, aleatorioNum, aleatorioX, aleatorioY) && VerificarFigura(Tablero, aleatorioNum, aleatorioX, aleatorioY))
                     Tablero[aleatorioX, aleatorioY] = aleatorioNum;
                 cont++;
             }
             return Tablero;
 
+        }
+        public int[,] GenerarSudokuVacio()
+        {
+            for (int i = 0; i < N; i++)
+            {
+                for (int j = 0; j < N; j++)
+                {
+                    Tablero[i, j] = 0;
+                }
+            }
+            return Tablero;
         }
 
 
@@ -812,7 +968,7 @@ namespace PruebasSudoku {
 
             for (int i = 1; i <= N; i++)
             {
-                if (VerificarColumnas(tablero, i, parX, parY) && VerificarFilas(tablero, i, parX, parY) && VerificarFigura(tablero, i, parX, parY))
+                if (VerificarFilasYColumnas(tablero, i, parX, parY) && VerificarFigura(tablero, i, parX, parY))
                 {
                     Tablero[parX, parY] = i;
                     //Console.WriteLine("-------------------------------------------------------------------------");
@@ -829,6 +985,499 @@ namespace PruebasSudoku {
             }
             return false;
         }
+        public bool ResolverDos(int[,] tablero)
+        {
+            Ubicacion ubi = NextEmpty(tablero);
+            if (ubi.GetX() == -1 && ubi.GetY() == -1)       //resuelto
+                return true;
+
+            int parX = ubi.GetX();
+            int parY = ubi.GetY();
+
+            for (int i = 1; i <= N; i++)
+            {
+                if (VerificarFilasYColumnas(tablero, i, parX, parY) && VerificarFigura(tablero, i, parX, parY) && VerificarOperacion(tablero, i, parX, parY))
+                {
+                    Tablero[parX, parY] = i;
+                    ModificarFigura(parX, parY, i, 1);
+
+                    if (ResolverDos(tablero))
+                        return true;
+
+
+
+                    SetBackTracking(1);
+                    tablero[parX, parY] = 0;
+                    ModificarFigura(parX, parY, i, 2);
+
+                }
+            }
+            return false;
+        }
+
+
+        public void EjecutarAlgoritmoInicial()
+        {
+            //TimeSpan stop;
+            //TimeSpan start = new TimeSpan(DateTime.Now.Ticks);
+            Console.WriteLine("------------------------------------------------------------------------------------------");
+
+
+            int[,] sudoku = GenerarSudoku();
+            //Print(sudoku);
+            //Console.WriteLine("  ");
+            //Console.WriteLine("------------------------------------------------------------------------------------------");
+            if (true == Resolver(sudoku))
+            {
+                //Print(sudoku);
+                Solucion = sudoku;
+            }
+            else
+                Console.WriteLine("Fail");
+
+            //stop = new TimeSpan(DateTime.Now.Ticks);
+            //Console.WriteLine();
+            //Console.WriteLine(stop.Subtract(start).TotalMilliseconds);
+        }
+        public void EjecutarAlgoritmoResolucion()
+        {
+            //TimeSpan stop;
+            //TimeSpan start = new TimeSpan(DateTime.Now.Ticks);
+            Console.WriteLine("------------------------------------------------------------------------------------------");
+
+
+            int[,] sudoku = GenerarSudokuVacio();
+            //Print(sudoku);
+            //Console.WriteLine("  ");
+            //Console.WriteLine("------------------------------------------------------------------------------------------");
+            if (true == ResolverDos(sudoku))
+            {
+                Console.WriteLine("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" + Environment.NewLine);
+                Print(sudoku);
+                Solucion = sudoku;
+                Console.WriteLine("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" + Environment.NewLine);
+                string bt = GetBackTracking().ToString();
+                Console.WriteLine("BackTracking:" + bt + Environment.NewLine);
+            }
+            else
+                Console.WriteLine("Fail");
+
+            //stop = new TimeSpan(DateTime.Now.Ticks);
+            //Console.WriteLine();
+            //Console.WriteLine(stop.Subtract(start).TotalMilliseconds);
+        }
+
+        public void AsignarOperaciones()
+        {
+            int cont = 0;
+            Random rand = new Random();
+            while (ListaFiguras[cont] != null)
+            {
+                Figura fig = ListaFiguras[cont];
+                Ubicacion[] ubicaciones = fig.GetLista();
+                if (fig.GetTipo() == "solo")
+                {
+                    int x = ubicaciones[0].GetX();
+                    int y = ubicaciones[0].GetY();
+                    ListaFiguras[cont].SetNumMeta(Solucion[x, y]);
+
+                }
+                else
+                {
+                    if (fig.GetTipo() == "dos")
+                    {
+                        int x1 = Solucion[ubicaciones[0].GetX(), ubicaciones[0].GetY()];
+                        int x2 = Solucion[ubicaciones[1].GetX(), ubicaciones[1].GetY()];
+                        int numOp = rand.Next(1, 3);
+                        if (numOp == 1)
+                        {
+                            ListaFiguras[cont].SetNumMeta(x1 + x2);
+                            ListaFiguras[cont].SetOperacion("+");
+                            ListaFiguras[cont].SetAcumulado(0);
+                        }
+                        if (numOp == 2)
+                        {
+                            ListaFiguras[cont].SetNumMeta(x1 * x2);
+                            ListaFiguras[cont].SetOperacion("x");
+                            ListaFiguras[cont].SetAcumulado(1);
+                        }
+                    }
+                    else
+                    {
+                        int x1 = Solucion[ubicaciones[0].GetX(), ubicaciones[0].GetY()];
+                        int x2 = Solucion[ubicaciones[1].GetX(), ubicaciones[1].GetY()];
+                        int x3 = Solucion[ubicaciones[2].GetX(), ubicaciones[2].GetY()];
+                        int x4 = Solucion[ubicaciones[3].GetX(), ubicaciones[3].GetY()];
+                        int numOp = rand.Next(1, 3);
+                        if (numOp == 1)
+                        {
+                            ListaFiguras[cont].SetNumMeta(x1 + x2 + x3 + x4);
+                            ListaFiguras[cont].SetOperacion("+");
+                            ListaFiguras[cont].SetAcumulado(0);
+                        }
+                        if (numOp == 2)
+                        {
+                            ListaFiguras[cont].SetNumMeta(x1 * x2 * x3 * x4);
+                            ListaFiguras[cont].SetOperacion("x");
+                            ListaFiguras[cont].SetAcumulado(1);
+                        }
+                    }
+
+                }
+                cont++;
+            }
+        }
+        public void Guardar(string path)
+        {
+            string texto = "";
+            int cont = 0;
+            texto += N.ToString() + ";" + Environment.NewLine;
+            int lim = ContarElementosLista();
+            while (cont < lim - 1)
+            {
+                Figura fig = ListaFiguras[cont];
+                Ubicacion[] ubicaciones = fig.GetLista();
+                string num = fig.GetNumMeta().ToString();
+                if (fig.GetTipo() == "solo")
+                {
+                    string ubiX = ubicaciones[0].GetX().ToString();
+                    string ubiY = ubicaciones[0].GetY().ToString();
+                    string par = "[" + ubiX + "," + ubiY + "]";
+                    texto += fig.GetTipo() + ";" + par + ";" + num + ";" + fig.GetOperacion() + ";" + Environment.NewLine;
+                }
+                else
+                {
+                    if (fig.GetTipo() == "dos")
+                    {
+                        string ubi1 = "[" + ubicaciones[0].GetX().ToString() + "," + ubicaciones[0].GetY().ToString() + "]";
+                        string ubi2 = "[" + ubicaciones[1].GetX().ToString() + "," + ubicaciones[1].GetY().ToString() + "]";
+
+                        string par = ubi1 + "," + ubi2;
+                        texto += fig.GetTipo() + ";" + par + ";" + num + ";" + fig.GetOperacion() + ";" + Environment.NewLine;
+                    }
+                    else
+                    {
+                        string ubi1 = "[" + ubicaciones[0].GetX().ToString() + "," + ubicaciones[0].GetY().ToString() + "]";
+                        string ubi2 = "[" + ubicaciones[1].GetX().ToString() + "," + ubicaciones[1].GetY().ToString() + "]";
+                        string ubi3 = "[" + ubicaciones[2].GetX().ToString() + "," + ubicaciones[2].GetY().ToString() + "]";
+                        string ubi4 = "[" + ubicaciones[3].GetX().ToString() + "," + ubicaciones[3].GetY().ToString() + "]";
+                        string par = ubi1 + "," + ubi2 + "," + ubi3 + "," + ubi4;
+                        texto += fig.GetTipo() + ";" + par + ";" + num + ";" + fig.GetOperacion() + ";" + Environment.NewLine;
+                    }
+                }
+                cont++;
+            }
+            if (cont < ContarElementosLista())
+            {
+                Figura fig = ListaFiguras[cont];
+                Ubicacion[] ubicaciones = fig.GetLista();
+                string num = fig.GetNumMeta().ToString();
+                if (fig.GetTipo() == "solo")
+                {
+                    string ubiX = ubicaciones[0].GetX().ToString();
+                    string ubiY = ubicaciones[0].GetY().ToString();
+                    string par = "[" + ubiX + "," + ubiY + "]";
+                    texto += fig.GetTipo() + ";" + par + ";" + num + ";" + fig.GetOperacion() + ";";
+                }
+                else
+                {
+                    if (fig.GetTipo() == "dos")
+                    {
+                        string ubi1 = "[" + ubicaciones[0].GetX().ToString() + "," + ubicaciones[0].GetY().ToString() + "]";
+                        string ubi2 = "[" + ubicaciones[1].GetX().ToString() + "," + ubicaciones[1].GetY().ToString() + "]";
+
+                        string par = ubi1 + "," + ubi2;
+                        texto += fig.GetTipo() + ";" + par + ";" + num + ";" + fig.GetOperacion() + ";";
+                    }
+                    else
+                    {
+                        string ubi1 = "[" + ubicaciones[0].GetX().ToString() + "," + ubicaciones[0].GetY().ToString() + "]";
+                        string ubi2 = "[" + ubicaciones[1].GetX().ToString() + "," + ubicaciones[1].GetY().ToString() + "]";
+                        string ubi3 = "[" + ubicaciones[2].GetX().ToString() + "," + ubicaciones[2].GetY().ToString() + "]";
+                        string ubi4 = "[" + ubicaciones[3].GetX().ToString() + "," + ubicaciones[3].GetY().ToString() + "]";
+                        string par = ubi1 + "," + ubi2 + "," + ubi3 + "," + ubi4;
+                        texto += fig.GetTipo() + ";" + par + ";" + num + ";" + fig.GetOperacion() + ";";
+                    }
+                }
+            }
+            string newPath = path;
+            using (StreamWriter writetext = new StreamWriter(newPath + ".txt"))
+            {
+                writetext.WriteLine(texto);
+            }
+        }
+
+        public void Cargar(string path)
+        {
+            Figura[] NewListaFiguras = new Figura[N * N];
+            bool flag = true;
+            using (StreamReader readtext = new StreamReader(path))
+            {
+                while (readtext.EndOfStream == false)
+                {
+                    if (flag == true)
+                    {
+                        string linea = readtext.ReadLine();
+                        string size = "";
+                        int conta = 0;
+
+
+                        while (linea[conta] != ';')
+                        {
+                            size += linea[conta];
+                            conta++;
+                        }
+                        int N = ConvertStringToInt(size);
+                        SetN(N);
+                        flag = false;
+                    }
+                    else
+                    {
+                        string linea = readtext.ReadLine();
+                        string tipo = "";
+                        int cont = 0;
+
+
+                        while (linea[cont] != ';')
+                        {
+                            tipo += linea[cont];
+                            cont++;
+                        }
+                        cont++;
+                        if (tipo == "solo")
+                        {
+                            cont++;
+                            string str = "";
+                            while (linea[cont] != ',')
+                            {
+                                str += linea[cont].ToString();
+                                cont++;
+                            }
+                            int x = ConvertStringToInt(str);
+                            cont++;
+                            str = "";
+                            while (linea[cont] != ']')
+                            {
+                                str += linea[cont].ToString();
+                                cont++;
+                            }
+                            int y = ConvertStringToInt(str);
+                            cont += 2;
+                            str = "";
+                            while (linea[cont] != ';')
+                            {
+                                str += linea[cont].ToString();
+                                cont++;
+                            }
+                            int meta = ConvertStringToInt(str);
+                            Ubicacion ubi = new Ubicacion(x, y);
+                            Ubicacion[] lisUbi = new Ubicacion[1];
+                            lisUbi[0] = ubi;
+                            Figura fig = new Figura(lisUbi, tipo);
+                            fig.SetNumMeta(meta);
+
+
+                            SetLista(NewListaFiguras, fig);
+
+                        }
+                        else
+                        {
+                            if (tipo == "dos")
+                            {
+                                cont++;
+                                string str = "";
+                                while (linea[cont] != ',')
+                                {
+                                    str += linea[cont].ToString();
+                                    cont++;
+                                }
+                                int x1 = ConvertStringToInt(str);
+                                cont++;
+                                str = "";
+                                while (linea[cont] != ']')
+                                {
+                                    str += linea[cont].ToString();
+                                    cont++;
+                                }
+                                int y1 = ConvertStringToInt(str);
+                                cont += 3;
+                                str = "";
+                                while (linea[cont] != ',')
+                                {
+                                    str += linea[cont].ToString();
+                                    cont++;
+                                }
+                                int x2 = ConvertStringToInt(str);
+                                cont++;
+                                str = "";
+                                while (linea[cont] != ']')
+                                {
+                                    str += linea[cont].ToString();
+                                    cont++;
+                                }
+
+                                int y2 = ConvertStringToInt(str);
+                                cont += 2;
+                                str = "";
+                                while (linea[cont] != ';')
+                                {
+                                    str += linea[cont].ToString();
+                                    cont++;
+                                }
+                                int meta = ConvertStringToInt(str);
+                                cont++;
+                                str = "";
+                                while (linea[cont] != ';')
+                                {
+                                    str += linea[cont].ToString();
+                                    cont++;
+                                }
+                                string operacion = str;
+                                Ubicacion ubi1 = new Ubicacion(x1, y1);
+                                Ubicacion ubi2 = new Ubicacion(x2, y2);
+                                Ubicacion[] lisUbi = new Ubicacion[2];
+                                lisUbi[0] = ubi1;
+                                lisUbi[1] = ubi2;
+                                Figura fig = new Figura(lisUbi, tipo);
+                                fig.SetNumMeta(meta);
+                                fig.SetOperacion(operacion);
+                                if (operacion == "+")
+                                    fig.SetAcumulado(0);
+                                else
+                                    fig.SetAcumulado(1);
+                                SetLista(NewListaFiguras, fig);
+                            }
+                            else
+                            {
+                                cont++;
+                                string str = "";
+                                while (linea[cont] != ',')
+                                {
+                                    str += linea[cont].ToString();
+                                    cont++;
+                                }
+                                int x1 = ConvertStringToInt(str);
+                                cont++;
+                                str = "";
+                                while (linea[cont] != ']')
+                                {
+                                    str += linea[cont].ToString();
+                                    cont++;
+                                }
+                                int y1 = ConvertStringToInt(str);
+                                cont += 3;
+                                str = "";
+                                while (linea[cont] != ',')
+                                {
+                                    str += linea[cont].ToString();
+                                    cont++;
+                                }
+                                int x2 = ConvertStringToInt(str);
+                                cont++;
+                                str = "";
+                                while (linea[cont] != ']')
+                                {
+                                    str += linea[cont].ToString();
+                                    cont++;
+                                }
+
+                                int y2 = ConvertStringToInt(str);
+                                cont += 3;
+                                str = "";
+
+                                while (linea[cont] != ',')
+                                {
+                                    str += linea[cont].ToString();
+                                    cont++;
+                                }
+                                int x3 = ConvertStringToInt(str);
+                                cont++;
+                                str = "";
+                                while (linea[cont] != ']')
+                                {
+                                    str += linea[cont].ToString();
+                                    cont++;
+                                }
+
+                                int y3 = ConvertStringToInt(str);
+                                cont += 3;
+                                str = "";
+
+                                while (linea[cont] != ',')
+                                {
+                                    str += linea[cont].ToString();
+                                    cont++;
+                                }
+                                int x4 = ConvertStringToInt(str);
+                                cont++;
+                                str = "";
+                                while (linea[cont] != ']')
+                                {
+                                    str += linea[cont].ToString();
+                                    cont++;
+                                }
+
+                                int y4 = ConvertStringToInt(str);
+                                cont += 2;
+                                str = "";
+                                while (linea[cont] != ';')
+                                {
+                                    str += linea[cont].ToString();
+                                    cont++;
+                                }
+                                int meta = ConvertStringToInt(str);
+                                cont++;
+                                str = "";
+                                while (linea[cont] != ';')
+                                {
+                                    str += linea[cont].ToString();
+                                    cont++;
+                                }
+                                string operacion = str;
+                                Ubicacion ubi1 = new Ubicacion(x1, y1);
+                                Ubicacion ubi2 = new Ubicacion(x2, y2);
+                                Ubicacion ubi3 = new Ubicacion(x3, y3);
+                                Ubicacion ubi4 = new Ubicacion(x4, y4);
+                                Ubicacion[] lisUbi = new Ubicacion[4];
+                                lisUbi[0] = ubi1;
+                                lisUbi[1] = ubi2;
+                                lisUbi[2] = ubi3;
+                                lisUbi[3] = ubi4;
+                                Figura fig = new Figura(lisUbi, tipo);
+                                fig.SetNumMeta(meta);
+                                fig.SetOperacion(operacion);
+                                if (operacion == "+")
+                                    fig.SetAcumulado(0);
+                                else
+                                    fig.SetAcumulado(1);
+                                SetLista(NewListaFiguras, fig);
+                            }
+                        }
+                    }
+                }
+            }
+            ListaFiguras = NewListaFiguras;
+        }
+        public int ConvertStringToInt(string intString)
+        {
+            int i = 0;
+            if (!Int32.TryParse(intString, out i))
+            {
+                i = -1;
+            }
+            return i;
+        }
+
+
+        public void CrearSudokusFinal()
+        {
+            GenerarFiguras();
+
+            EjecutarAlgoritmoInicial();
+
+            AsignarOperaciones();
+        }
 
     }
+
 }

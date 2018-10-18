@@ -46,6 +46,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Modelo\BotonDobleTexto.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Vista\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -42,6 +42,8 @@
             this.btnGuardar = new System.Windows.Forms.Button();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.lblTiempo = new System.Windows.Forms.Label();
+            this.lblNombreTiempo = new System.Windows.Forms.Label();
             this.panelGeneracion.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trckTam)).BeginInit();
             this.panelOpciones.SuspendLayout();
@@ -138,6 +140,8 @@
             // 
             // panelOpciones
             // 
+            this.panelOpciones.Controls.Add(this.lblNombreTiempo);
+            this.panelOpciones.Controls.Add(this.lblTiempo);
             this.panelOpciones.Controls.Add(this.lblBacktracking);
             this.panelOpciones.Controls.Add(this.lblCantBacktracking);
             this.panelOpciones.Controls.Add(this.lblOpciones);
@@ -154,7 +158,7 @@
             this.lblBacktracking.AccessibleName = "Amount of backtracking done to solve sudoku";
             this.lblBacktracking.AutoSize = true;
             this.lblBacktracking.Font = new System.Drawing.Font("Bahnschrift Light", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblBacktracking.Location = new System.Drawing.Point(187, 190);
+            this.lblBacktracking.Location = new System.Drawing.Point(128, 169);
             this.lblBacktracking.Name = "lblBacktracking";
             this.lblBacktracking.Size = new System.Drawing.Size(16, 18);
             this.lblBacktracking.TabIndex = 9;
@@ -165,11 +169,11 @@
             this.lblCantBacktracking.AccessibleName = "Number of backtracking";
             this.lblCantBacktracking.AutoSize = true;
             this.lblCantBacktracking.Font = new System.Drawing.Font("Bahnschrift Light", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCantBacktracking.Location = new System.Drawing.Point(3, 190);
+            this.lblCantBacktracking.Location = new System.Drawing.Point(3, 169);
             this.lblCantBacktracking.Name = "lblCantBacktracking";
-            this.lblCantBacktracking.Size = new System.Drawing.Size(131, 18);
+            this.lblCantBacktracking.Size = new System.Drawing.Size(98, 18);
             this.lblCantBacktracking.TabIndex = 8;
-            this.lblCantBacktracking.Text = "Num backtracking:";
+            this.lblCantBacktracking.Text = "Backtracking:";
             // 
             // lblOpciones
             // 
@@ -237,6 +241,27 @@
             this.tableLayoutPanel1.Size = new System.Drawing.Size(784, 545);
             this.tableLayoutPanel1.TabIndex = 2;
             // 
+            // lblTiempo
+            // 
+            this.lblTiempo.AutoSize = true;
+            this.lblTiempo.Font = new System.Drawing.Font("Bahnschrift Light", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTiempo.Location = new System.Drawing.Point(128, 193);
+            this.lblTiempo.Name = "lblTiempo";
+            this.lblTiempo.Size = new System.Drawing.Size(80, 18);
+            this.lblTiempo.TabIndex = 3;
+            this.lblTiempo.Text = "0m 0s 0ms";
+            // 
+            // lblNombreTiempo
+            // 
+            this.lblNombreTiempo.AccessibleName = "Number of backtracking";
+            this.lblNombreTiempo.AutoSize = true;
+            this.lblNombreTiempo.Font = new System.Drawing.Font("Bahnschrift Light", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblNombreTiempo.Location = new System.Drawing.Point(3, 193);
+            this.lblNombreTiempo.Name = "lblNombreTiempo";
+            this.lblNombreTiempo.Size = new System.Drawing.Size(59, 18);
+            this.lblNombreTiempo.TabIndex = 10;
+            this.lblNombreTiempo.Text = "Tiempo:";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -276,6 +301,8 @@
         private System.Windows.Forms.Button btnGenerar;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.Label lblTiempo;
+        private System.Windows.Forms.Label lblNombreTiempo;
     }
 }
 
