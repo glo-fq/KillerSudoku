@@ -108,13 +108,13 @@ namespace KillerSudokuWindowsForms {
         private List<Color> GenerarColores() {
             List<Color> colores = new List<Color>(); //Agregar colores
             colores.Add(Color.BlueViolet);
-            colores.Add(Color.DarkGoldenrod);
+            colores.Add(Color.Goldenrod);
             colores.Add(Color.Chartreuse);
             colores.Add(Color.Coral);
             colores.Add(Color.DeepPink); //5
             colores.Add(Color.DeepSkyBlue);
-            colores.Add(Color.Red);
-            colores.Add(Color.Blue);
+            colores.Add(Color.Firebrick);
+            colores.Add(Color.MidnightBlue);
             colores.Add(Color.Yellow);
             colores.Add(Color.PeachPuff); //10
             colores.Add(Color.Orange);

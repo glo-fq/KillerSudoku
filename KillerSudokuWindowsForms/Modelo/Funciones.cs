@@ -1478,6 +1478,70 @@ namespace KillerSudokuWindowsForms.Modelo
             AsignarOperaciones();
         }
 
+        public void Permutar(int n)
+        {
+            int suma = 0;
+            List<int> lis = new List<int>();
+            for (int a = 1; a < n + 1; a++)
+            {
+                for (int b = 1; b < n + 1; b++)
+                {
+                    for (int c = 1; c < n + 1; c++)
+                    {
+                        for (int d = 1; d < n + 1; d++)
+                        {
+
+                            if ((a != b) && (b != c) && (c != d) && (a != c) && (a != d) && (b != d))
+                            {
+                                suma = Int32.Parse(a.ToString() + b.ToString() + c.ToString() + d.ToString());
+                                if (Rep(lis, suma) == false)
+                                {
+                                    lis.Add(suma);
+                                    Console.WriteLine(suma);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public bool Rep(List<int> lista, int num)
+        {
+            string s = num.ToString();
+            char d1 = s[0];
+            char d2 = s[1];
+            char d3 = s[2];
+            char d4 = s[3];
+            int cont = 0;
+            bool flag = true;
+            for (int i = 0; i < lista.Count; i++)
+            {
+                int j = lista[i];
+
+                string st = j.ToString();
+                char x1 = st[0];
+                char x2 = st[1];
+                char x3 = st[2];
+                char x4 = st[3];
+                if (x1 == d1 || x1 == d2 || x1 == d3 || x1 == d4)
+                {
+                    if (x2 == d1 || x2 == d2 || x2 == d3 || x2 == d4)
+                    {
+                        if (x3 == d1 || x3 == d2 || x3 == d3 || x3 == d4)
+                        {
+                            if (x4 == d1 || x4 == d2 || x4 == d3 || x4 == d4)
+                                return true;
+
+
+                        }
+
+                    }
+
+                }
+            }
+            return false;
+        }
     }
 
 }
