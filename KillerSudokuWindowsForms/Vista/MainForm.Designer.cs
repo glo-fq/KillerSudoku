@@ -61,7 +61,7 @@
             this.panelGeneracion.Controls.Add(this.lblTamMin);
             this.panelGeneracion.Controls.Add(this.lblTam);
             this.panelGeneracion.Controls.Add(this.trckTam);
-            this.panelGeneracion.Location = new System.Drawing.Point(888, 12);
+            this.panelGeneracion.Location = new System.Drawing.Point(1089, 12);
             this.panelGeneracion.Name = "panelGeneracion";
             this.panelGeneracion.Size = new System.Drawing.Size(239, 178);
             this.panelGeneracion.TabIndex = 0;
@@ -148,7 +148,7 @@
             this.panelOpciones.Controls.Add(this.btnCargar);
             this.panelOpciones.Controls.Add(this.btnSolucionar);
             this.panelOpciones.Controls.Add(this.btnGuardar);
-            this.panelOpciones.Location = new System.Drawing.Point(888, 338);
+            this.panelOpciones.Location = new System.Drawing.Point(1092, 462);
             this.panelOpciones.Name = "panelOpciones";
             this.panelOpciones.Size = new System.Drawing.Size(239, 219);
             this.panelOpciones.TabIndex = 1;
@@ -238,7 +238,7 @@
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(870, 545);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(1071, 669);
             this.tableLayoutPanel1.TabIndex = 2;
             // 
             // lblTiempo
@@ -266,7 +266,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1139, 569);
+            this.ClientSize = new System.Drawing.Size(1340, 693);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.panelOpciones);
             this.Controls.Add(this.panelGeneracion);
